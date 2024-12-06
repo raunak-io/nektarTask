@@ -1,0 +1,208 @@
+openapi: 3.0.0
+info:
+  title: Email and Calendar API
+  description: API for accessing Gmail messages and Calendar events
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+    description: Development server
+
+paths:
+  /api/gmail:
+    get:
+      summary: List email messages
+      description: Returns a paginated list of email messages
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+          description: Number of messages to return
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 0
+          description: Number of messages to skip
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EmailMessage'
+                  total:
+                    type: integer
+                    example: 100
+                  limit:
+                    type: integer
+                    example: 5
+                  offset:
+                    type: integer
+                    example: 0
+
+  /api/gmail/{id}:
+    get:
+      summary: Get email message by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: Message ID
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/EmailMessage'
+
+  /api/calendar:
+    get:
+      summary: List calendar events
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+          description: Number of events to return
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 0
+          description: Number of events to skip
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CalendarEvent'
+                  total:
+                    type: integer
+                    example: 50
+                  limit:
+                    type: integer
+                    example: 5
+                  offset:
+                    type: integer
+                    example: 0
+
+  /api/calendar/{id}:
+    get:
+      summary: Get calendar event by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: Event ID
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/CalendarEvent'
+
+components:
+  schemas:
+    EmailMessage:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 'msg123'
+        payload:
+          type: object
+          properties:
+            body:
+              type: object
+              properties:
+                data:
+                  type: string
+                  example: 'Email content'
+                size:
+                  type: integer
+                  example: 1024
+            partId:
+              type: string
+              example: '0'
+            headers:
+              type: array
+              items:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: 'From'
+                  value:
+                    type: string
+                    example: 'sender@example.com'
+        internalDate:
+          type: string
+          format: date-time
+          example: '2023-12-01T10:00:00Z'
+
+    CalendarEvent:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 'evt123'
+        start:
+          type: object
+          properties:
+            dateTime:
+              type: string
+              format: date-time
+              example: '2023-12-01T10:00:00Z'
+            timeZone:
+              type: string
+              example: 'UTC'
+        end:
+          type: object
+          properties:
+            dateTime:
+              type: string
+              format: date-time
+              example: '2023-12-01T11:00:00Z'
+            timeZone:
+              type: string
+              example: 'UTC'
+        summary:
+          type: string
+          example: 'Team Meeting'
+        attendees:
+          type: array
+          items:
+            type: object
+            properties:
+              email:
+                type: string
+                example: 'attendee@example.com'
+              responseStatus:
+                type: string
+                example: 'accepted'
